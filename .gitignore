@@ -1,0 +1,20 @@
+/.idea/.gitignore
+/Classification.aux
+/Decision Trees.aux
+/.idea/dictionaries
+/Dimensionality Reduction.aux
+/End-to-End Machine Learning Project.aux
+/Ensemble Learning and Random Forests.aux
+/Main.aux
+/Main.log
+/Main.out
+/Main.synctex.gz
+/Main.toc
+/.idea/misc.xml
+/Support Vector Machines.aux
+/The Machine Learning Landscape.aux
+/Training Models.aux
+/Unsupervised Learning Techniques.aux
+.aux
+.toc
+.log
