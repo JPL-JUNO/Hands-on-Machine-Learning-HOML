@@ -1,3 +1,4 @@
+\usepackage{amsmath}
 
 \usepackage{mathptmx}
 \usepackage{minted}
@@ -8,7 +9,7 @@
 \setkeys{Gin}{width=0.75\textwidth}
 \usepackage{listings}
 
-%\setminted[python]{bgcolor=red!5, linenos, breakanywhere=true}
+\setminted[python]{bgcolor=orange!5, linenos, breakanywhere=true}
 
 
 
@@ -21,8 +22,14 @@ to Build Intelligent Systems
 
 	}
 	
-\author{Stephen CUI}
+\author{Stephen CUI\thanks{cuixuanStephen@gmail.com}
+}
 \date{October 30, 2022}
+\newcommand\explain[2]{
+\begin{tcolorbox}[breakable,colback=blue!5,colframe=blue!95!black,title=\textbf{#1}, breakable]
+#2
+\end{tcolorbox}
+}
 
 
 \tcbuselibrary{minted, skins, breakable}
