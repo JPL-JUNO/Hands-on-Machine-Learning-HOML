@@ -9,8 +9,10 @@
 \setkeys{Gin}{width=0.75\textwidth}
 \usepackage{listings}
 
-\setminted[python]{bgcolor=orange!5, linenos, breakanywhere=true}
 
+\setminted[python]{bgcolor=orange!5, linenos, breakanywhere=true}
+%定义新的minted命令
+\newminted[pyc]{python}{}
 
 
 \title{\textbf{Hands-on
@@ -26,10 +28,14 @@ to Build Intelligent Systems
 }
 \date{October 30, 2022}
 \newcommand\explain[2]{
-\begin{tcolorbox}[breakable,colback=blue!5,colframe=blue!95!black,title=\textbf{#1}, breakable]
+\begin{tcolorbox}[breakable,colback=orange!5,colframe=orange!95!black,title=\textbf{#1}, breakable]
 #2
 \end{tcolorbox}
 }
+
+\newcommand\tips[1]{\textbf{Tips: } #1}
+\newcommand\notes[1]{\textbf{Notes: } #1}
+\newcommand\warning[1]{\textbf{Warning: } #1}
 
 
 \tcbuselibrary{minted, skins, breakable}
@@ -54,7 +60,7 @@ to Build Intelligent Systems
 \usepackage{hyperref}
 \hypersetup{
 	colorlinks=true,
-	linkcolor=orange!70!black,
+	linkcolor=orange!95!black,
 	filecolor=blue,      
 	urlcolor=orange!80!white,
 	citecolor=green,
