@@ -405,6 +405,82 @@ strat_test_set['income_cat'].value_counts() / len(strat_test_set)
 income category proportions almost identical to those in the full dataset, whereas the
 test set generated using purely random sampling is skewed(for more see \href{https://github.com/JPL-JUNO/HOML/blob/main/chapter/chapter2.ipynb}{Notebook chapter2}).
 
+Now you should remove the \verb|income_cat| attribute so the data is back to its original
+state:
+\begin{pyc}
+for set_ in (strat_train_set, strat_test_set):
+    set_.drop('income_cat', axis='columns', inplace=True)
+\end{pyc}
+
 We spent quite a bit of time on test set generation for a good reason: this is an often
 neglected but critical part of a Machine Learning project. Moreover, many of these
 ideas will be useful later when we discuss cross-validation.
+
+\section{Discover and Visualize the Data to Gain Insights}
+First, make sure you have put the test set aside and you are only exploring the training set. Also, if the training set is very large, you may want to sample an exploration
+set, to make manipulations easy and fast.
+
+\subsection{Visualizing Geographical Data}
+
+Since there is geographical information (latitude and longitude), it is a good idea to
+create a scatterplot of all districts to visualize the data (\autoref{A geographical scatterplot of the data}):
+\figures{A geographical scatterplot of the data}
+
+Setting the alpha option to 0.1 makes it much easier to visualize the places
+where there is a high density of data points(\autoref{A better visualization that highlights high-density areas}).
+
+\figures{A better visualization that highlights high-density areas}
+
+Our brains are very good at spotting patterns in pictures, but you may need to play
+around with visualization parameters to make the patterns stand out.
+
+Now let’s look at the housing prices (\autoref{California housing prices}).
+\figures{California housing prices}
+\begin{pyc}
+housing.plot(kind='scatter', x='longitude', y='latitude', alpha=.4, s=housing['population']/100,
+             label='population', figsize=(10, 7),
+             c='median_house_value', cmap=plt.get_cmap('jet'), colorbar=True)
+plt.legend()
+plt.show()
+\end{pyc}
+
+
+This image tells you that the housing prices are very much related to the location
+(e.g., close to the ocean) and to the population density, as you probably knew already.
+A clustering algorithm should be useful for detecting the main cluster and for adding
+new features that measure the proximity to the cluster centers. The ocean proximity
+attribute may be useful as well, although in Northern California the housing prices in
+coastal districts are not too high, so it is not a simple rule.
+
+\subsection{Looking for Correlations}
+Since the dataset is not too large, you can easily compute the \emph{standard correlation
+coefficient} (also called \emph{Pearson’s r}) between every pair of attributes using the \verb|corr()| method:
+\begin{pyc}
+corr_matrix = housing.corr()
+corr_matrix['median_house_value'].sort_values(ascending=False)
+\end{pyc}
+
+\autoref{Standard correlation coefficient of various datasets} shows various plots along with the correlation coefficient between their horizontal and vertical axes.
+
+\figures{Standard correlation coefficient of various datasets}
+\warning{The correlation coefficient only measures linear correlations (“if x
+goes up, then y generally goes up/down”). It may completely miss
+out on nonlinear relationships (e.g., “if x is close to 0, then y generally goes up”). }
+
+Another way to check for correlation between attributes is to use the pandas
+\verb|scatter_matrix()| function, which plots every numerical attribute against every other numerical attribute(\href{https://github.com/JPL-JUNO/HOML/blob/main/chapter/chapter2.ipynb}{You can see here}).
+
+The most promising attribute to predict the median house value is the median
+income, so let’s zoom in on their correlation scatterplot (\autoref{Median income versus median house value}):
+
+\figures{Median income versus median house value}
+
+This plot reveals a few things. First, the correlation is indeed very strong; you can
+clearly see the upward trend, and the points are not too dispersed. Second, the price
+cap that we noticed earlier is clearly visible as a horizontal line at \$500,000. But this
+plot reveals other less obvious straight lines: a horizontal line around \$450,000,
+another around \$350,000, perhaps one around \$280,000, and a few more below that.
+You may want to try removing the corresponding districts to prevent your algorithms
+from learning to reproduce these data quirks.
+
+\subsection{Experimenting with Attribute Combinations}
