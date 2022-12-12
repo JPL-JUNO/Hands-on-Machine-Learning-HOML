@@ -484,3 +484,53 @@ You may want to try removing the corresponding districts to prevent your algorit
 from learning to reproduce these data quirks.
 
 \subsection{Experimenting with Attribute Combinations}
+
+\subsection{Handling Text and Categorical Attributes}
+Most Machine Learning algorithms prefer to work with numbers, so let’s convert these categories from
+text to numbers. For this, we can use Scikit-Learn’s OrdinalEncoder class:
+
+\begin{pyc}
+from sklearn.preprocessing import OrdinalEncoder
+ordinal_encoder = OrdinalEncoder()
+housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
+housing_cat_encoded[:10]
+\end{pyc}
+You can get the list of categories using the \verb|categories_| instance variable. It is a list
+containing a 1D array of categories for each categorical attribute (in this case, a list
+containing a single array since there is just one categorical attribute):
+
+One issue with this representation is that ML algorithms will assume that two nearby values are more similar than two distant values. This may be fine in some cases (e.g., for ordered categories such as “bad,” “average,” “good,” and “excellent”), but it is obviously not the case for the \verb|ocean_proximity| column (for example, categories 0 and 4 are clearly more similar than categories 0 and 1). To fix this issue, a common solution is to create one binary attribute per category: one attribute equal to 1 when the category is “$\textless$1H OCEAN” (and 0 otherwise), another attribute equal to 1 when the category is “INLAND” (and 0 otherwise), and so on. This is called one-hot encoding,
+because only one attribute will be equal to 1 (hot), while the others will be 0 (cold).
+The new attributes are sometimes called dummy attributes. Scikit-Learn provides a
+OneHotEncoder class to convert categorical values into one-hot vectors:
+
+\begin{pyc}
+from sklearn.preprocessing import OneHotEncoder
+cat_encoder = OneHotEncoder()
+housing_cat_1hot = cat_encoder.fit_transform(housing_cat)
+housing_cat_1hot
+\end{pyc}
+
+Notice that the output is a SciPy \emph{sparse matrix}, instead of a NumPy array. This is very
+useful when you have categorical attributes with thousands of categories. After one-hot encoding, we get a matrix with thousands of columns, and the matrix is full of 0s
+except for a single 1 per row. Using up tons of memory mostly to store zeros would
+be very wasteful, so instead a sparse matrix only stores the location of the nonzero
+elements. You can use it mostly like a normal 2D array but if you really want to convert it to a (dense) NumPy array, just call the \verb|toarray()| method.
+
+\tips{If a categorical attribute has a large number of possible categories
+(e.g., country code, profession, species), then one-hot encoding will
+result in a large number of input features. This may slow down
+training and degrade performance. If this happens, you may want
+to replace the categorical input with useful numerical features
+related to the categories: for example, you could replace the
+ocean\_proximity feature with the distance to the ocean (similarly,
+a country code could be replaced with the country’s population and
+GDP per capita). Alternatively, you could replace each category
+with a learnable, low-dimensional vector called an embedding. Each
+category’s representation would be learned during training. This is
+an example of representation learning (see Chapters \autoref{13} and \autoref{17} for
+more details).}
+
+\subsubsection{Custom Transformers}
+You will want your transformer to work seamlessly with Scikit-Learn functionalities (such as pipelines), and since Scikit-Learn relies on duck typing (not inheritance), all you need to do is create a class and implement three methods: \verb|fit()|
+(returning \verb|self|), \verb|transform()|, and \verb|fit_transform()|.
