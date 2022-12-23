@@ -24,7 +24,7 @@ to get data:
 
 \item Other pages listing many popular open data repositories
 \begin{itemize}
-\item \href{https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research}{Wikipedia’s list of Machine Learning datasets}
+\item \href{https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research}{Wikipedia's list of Machine Learning datasets}
 
 \item\href{https://www.quora.com/Where-can-I-find-large-datasets-open-to-the-public}{Quora.com}
 
@@ -39,8 +39,8 @@ model is probably not the end goal. How does the company expect to use and benef
 from this model? Knowing the objective is important because it will determine how
 you frame the problem, which algorithms you will select, which performance measure you will use to evaluate your model, and how much effort you will spend tweaking it.
 
-Your boss answers that your model's output (a prediction of a district’s median housing price) will be fed to another Machine Learning system (see \autoref{A Machine Learning pipeline for real estate investments}), along
-with many other signals\footnote{A piece of information fed to a Machine Learning system is often called a signal, in reference to Claude Shannon’s information theory, which he developed at Bell Labs to improve telecommunications. His theory: you
+Your boss answers that your model's output (a prediction of a district's median housing price) will be fed to another Machine Learning system (see \autoref{A Machine Learning pipeline for real estate investments}), along
+with many other signals\footnote{A piece of information fed to a Machine Learning system is often called a signal, in reference to Claude Shannon's information theory, which he developed at Bell Labs to improve telecommunications. His theory: you
 want a high signal-to-noise ratio.}.
 
 \begin{figure}
@@ -63,7 +63,7 @@ graph), and different teams can focus on different components. Moreover, if a co
 This makes the architecture quite robust.
 
 On the other hand, a broken component can go unnoticed for some time if proper
-monitoring is not implemented. The data gets stale and the overall system’s performance drops.
+monitoring is not implemented. The data gets stale and the overall system's performance drops.
 }
 
 The next question to ask your boss is what the current solution looks like (if any).
@@ -117,8 +117,8 @@ the dataset. There is one row per instance, and the $i^{th}$ row is equal to the
 \vdots&\vdots&\vdots&\vdots\\
 \end{bmatrix}
 \end{align*}
-\item  $h$ is your system’s prediction function, also called a \emph{hypothesis}. When your system
-is given an instance’s feature vector $\mathbf{x}^{(i)}$, it outputs a predicted value $\hat{y}^{(i)} = h(\mathbf{x}^{(i)})$ for that instance.
+\item  $h$ is your system's prediction function, also called a \emph{hypothesis}. When your system
+is given an instance's feature vector $\mathbf{x}^{(i)}$, it outputs a predicted value $\hat{y}^{(i)} = h(\mathbf{x}^{(i)})$ for that instance.
 
 \item $RMSE(\mathbf{X}, h)$ is the cost function measured on the set of examples using your
 hypothesis \emph{h}.
@@ -166,8 +166,8 @@ Machine Learning system, and you assume that these prices are going to be used a
 such. But what if the downstream system converts the prices into categories (e.g.,
 “cheap,” “medium,” or “expensive”) and then uses those categories instead of the pri‐
 ces themselves? In this case, getting the price perfectly right is not important at all;
-your system just needs to get the category right. If that’s so, then the problem should
-have been framed as a classification task, not a regression task. You don’t want to find
+your system just needs to get the category right. If that's so, then the problem should
+have been framed as a classification task, not a regression task. You don't want to find
 this out after working on a regression system for months.
 
 \section{Get the Data}
@@ -186,10 +186,10 @@ latest data (or you can set up a scheduled job to do that automatically at regul
 the dataset on multiple machines.
 
 \subsection{Take a Quick Look at the Data Structure}
-Let’s take a look at the five rows using the DataFrame’s \verb|sample(n=5)| method instead of \verb|head(n=5)|.
+Let's take a look at the five rows using the DataFrame's \verb|sample(n=5)| method instead of \verb|head(n=5)|.
 
 The \verb|info()| method is useful to get a quick description of the data, in particular the
-total number of rows, each attribute’s type, and the number of nonnull values. Notice that the 
+total number of rows, each attribute's type, and the number of nonnull values. Notice that the 
 \verb|total_bedrooms| attribute has only 20,433 nonnull values, meaning that 207 districts are missing
 this feature. We will need to take care of this later.
 
@@ -237,8 +237,8 @@ plt.show()
 \notes{
 The \texttt{hist()} method relies on Matplotlib, which in turn relies on a
 user-specified graphical backend to draw on your screen. So before
-you can plot anything, you need to specify which backend Matplotlib should use. The simplest option is to use Jupyter’s magic command \texttt{\%matplotlib inline}. This tells Jupyter to set up Matplotlib
-so it uses Jupyter’s own backend. Plots are then rendered within the
+you can plot anything, you need to specify which backend Matplotlib should use. The simplest option is to use Jupyter's magic command \texttt{\%matplotlib inline}. This tells Jupyter to set up Matplotlib
+so it uses Jupyter's own backend. Plots are then rendered within the
 notebook itself. Note that calling \texttt{show()} is optional in a Jupyter
 notebook, as Jupyter will automatically display plots when a cell is
 executed.
@@ -254,7 +254,7 @@ data was computed.
 \item
 The housing median age and the median house value were also capped. The latter may be a serious problem since it is your target attribute (your labels). Your
 Machine Learning algorithms may learn that prices never go beyond that limit.
-You need to check with your client team (the team that will use your system’s output) to see if this is a problem or not. If they tell you that they need precise predictions even beyond \$500,000, then you have two options:
+You need to check with your client team (the team that will use your system's output) to see if this is a problem or not. If they tell you that they need precise predictions even beyond \$500,000, then you have two options:
 \begin{enumerate}
 \item Collect proper labels for the districts whose labels were capped.
 \item Remove those districts from the training set (and also from the test set, since
@@ -303,15 +303,15 @@ Well, this works, but it is not perfect: if you run the program again, it will g
 see the whole dataset, which is what you want to avoid.
 
 One solution is to save the test set on the first run and then load it in subsequent
-runs. \textbf{Another option is to set the random number generator’s seed} (e.g., with \verb|np.random.seed(42)|)\footnote{You will often see people set the random seed to 42. This number has no special property, other than to be the
+runs. \textbf{Another option is to set the random number generator's seed} (e.g., with \verb|np.random.seed(42)|)\footnote{You will often see people set the random seed to 42. This number has no special property, other than to be the
 Answer to the Ultimate Question of Life, the Universe, and Everything.} before calling \verb|np.random.permutation()| so that it always generates
 the same shuffled indices.
 
 But both these solutions will break the next time you fetch an updated dataset. To
 have a stable train/test split even after updating the dataset, a common solution is to
-use each instance’s identifier to decide whether or not it should go in the test set
+use each instance's identifier to decide whether or not it should go in the test set
 (assuming instances have a unique and immutable identifier). For example, you could
-compute a hash of each instance’s identifier and put that instance in the test set if the
+compute a hash of each instance's identifier and put that instance in the test set if the
 hash is lower than or equal to 20\% of the maximum hash value. This ensures that the
 test set will remain consistent across multiple runs, even if you refresh the dataset.
 The new test set will contain 20\% of the new instances, but it will not contain any
@@ -336,7 +336,7 @@ len(train_set), len(test_set)
 
 If you use the row index as a unique identifier, you need to make sure that new data
 gets appended to the end of the dataset and that no row ever gets deleted. If this is not
-possible, then \textbf{you can try to use the most stable features to build a unique identifier}. For example, a district’s latitude and longitude are guaranteed to be stable for a few
+possible, then \textbf{you can try to use the most stable features to build a unique identifier}. For example, a district's latitude and longitude are guaranteed to be stable for a few
 million years, so you could combine them into an ID like so:
 
 \begin{pyc}
@@ -361,7 +361,7 @@ len(train_set), len(test_set)
 So far we have considered purely random sampling methods. This is generally fine if
 your dataset is large enough (especially relative to the number of attributes), but if it
 is not, you \textbf{run the risk of introducing a significant sampling bias}. When a survey
-company decides to call 1,000 people to ask them a few questions, they don’t just pick
+company decides to call 1,000 people to ask them a few questions, they don't just pick
 1,000 people randomly in a phone book. They try to ensure that these 1,000 people
 are representative of the whole population. For example, the US population is 51.3\%
 females and 48.7\% males, so a well-conducted survey in the US would try to maintain
@@ -374,7 +374,7 @@ random sampling, there would be about a 11.29\% chance of sampling a skewed test
 Suppose you chatted with experts who told you that the median income is a very
 important attribute to predict median housing prices. You may want to ensure that
 the test set is representative of the various categories of incomes in the whole dataset. It is important to have a sufficient number of instances in your dataset for each stratum, or else the estimate
-of a stratum’s importance may be biased. \textbf{This means that you should not have too
+of a stratum's importance may be biased. \textbf{This means that you should not have too
 many strata, and each stratum should be large enough.}
 
 \begin{pyc}
@@ -390,7 +390,7 @@ housing['income_cat'].hist()
 \label{Histogram of income categories}
 \end{figure}
 Now you are ready to do stratified sampling based on the income category. For this
-you can use Scikit-Learn’s \verb|StratifiedShuffleSplit|(more about \href{https://scikit-learn.org/stable/modules/cross_validation.html}{StratifiedShuffleSplit}) class:
+you can use Scikit-Learn's \verb|StratifiedShuffleSplit|(more about \href{https://scikit-learn.org/stable/modules/cross_validation.html}{StratifiedShuffleSplit}) class:
 
 \begin{pyc}
 from sklearn.model_selection import StratifiedShuffleSplit
@@ -434,7 +434,7 @@ where there is a high density of data points(\autoref{A better visualization tha
 Our brains are very good at spotting patterns in pictures, but you may need to play
 around with visualization parameters to make the patterns stand out.
 
-Now let’s look at the housing prices (\autoref{California housing prices}).
+Now let's look at the housing prices (\autoref{California housing prices}).
 \figures{California housing prices}
 \begin{pyc}
 housing.plot(kind='scatter', x='longitude', y='latitude', alpha=.4, s=housing['population']/100,
@@ -454,7 +454,7 @@ coastal districts are not too high, so it is not a simple rule.
 
 \subsection{Looking for Correlations}
 Since the dataset is not too large, you can easily compute the \emph{standard correlation
-coefficient} (also called \emph{Pearson’s r}) between every pair of attributes using the \verb|corr()| method:
+coefficient} (also called \emph{Pearson's r}) between every pair of attributes using the \verb|corr()| method:
 \begin{pyc}
 corr_matrix = housing.corr()
 corr_matrix['median_house_value'].sort_values(ascending=False)
@@ -471,7 +471,7 @@ Another way to check for correlation between attributes is to use the pandas
 \verb|scatter_matrix()| function, which plots every numerical attribute against every other numerical attribute(\href{https://github.com/JPL-JUNO/HOML/blob/main/chapter/chapter2.ipynb}{You can see here}).
 
 The most promising attribute to predict the median house value is the median
-income, so let’s zoom in on their correlation scatterplot (\autoref{Median income versus median house value}):
+income, so let's zoom in on their correlation scatterplot (\autoref{Median income versus median house value}):
 
 \figures{Median income versus median house value}
 
@@ -486,8 +486,8 @@ from learning to reproduce these data quirks.
 \subsection{Experimenting with Attribute Combinations}
 
 \subsection{Handling Text and Categorical Attributes}
-Most Machine Learning algorithms prefer to work with numbers, so let’s convert these categories from
-text to numbers. For this, we can use Scikit-Learn’s OrdinalEncoder class:
+Most Machine Learning algorithms prefer to work with numbers, so let's convert these categories from
+text to numbers. For this, we can use Scikit-Learn's OrdinalEncoder class:
 
 \begin{pyc}
 from sklearn.preprocessing import OrdinalEncoder
@@ -524,13 +524,38 @@ training and degrade performance. If this happens, you may want
 to replace the categorical input with useful numerical features
 related to the categories: for example, you could replace the
 ocean\_proximity feature with the distance to the ocean (similarly,
-a country code could be replaced with the country’s population and
+a country code could be replaced with the country's population and
 GDP per capita). Alternatively, you could replace each category
 with a learnable, low-dimensional vector called an embedding. Each
-category’s representation would be learned during training. This is
+category's representation would be learned during training. This is
 an example of representation learning (see Chapters \autoref{13} and \autoref{17} for
 more details).}
 
-\subsubsection{Custom Transformers}
+\subsection{Feature Scaling and Transformation}
+One of the most important transformations you need to apply to your data is \emph{feature scaling}. With few exceptions, machine learning algorithms don't perform well when the input numerical attributes have very different scales. There are two common ways to get all attributes to have the same scale: \emph{min-max scaling} and \emph{standardization}.
+
+\warning{As with all estimators, it is important to fit the scalers to the training data only: never use fit() or fit\_transform() for anything else than the training set. Once you have a trained scaler, you can then use it to transform() any other set, including the validation set, the test set, and new data. Note that while the training set values will always be scaled to the specified range, if new data contains outliers, these may end up scaled outside the range. If you want to avoid this, just set the clip hyperparameter to True.}
+
+Min-max scaling (many people call this normalization) is the simplest: for each
+attribute, the values are shifted and rescaled so that they end up ranging from
+0 to 1. This is performed by subtracting the min value and dividing by the difference between the min and the max. Scikit-Learn provides a transformer called
+MinMaxScaler for this. It has a \verb|feature_range| hyperparameter that lets you change
+the range if, for some reason, you don’t want 0–1 (e.g., neural networks work best
+with zero-mean inputs, so a range of –1 to 1 is preferable).
+
+Standardization is different: first it subtracts the mean value (so standardized values
+have a zero mean), then it divides the result by the standard deviation (so standardized values have a standard deviation equal to 1). Unlike min-max scaling, standardization does not restrict values to a specific range. However, standardization is much
+less affected by outliers. For example, suppose a district has a median income equal
+to 100 (by mistake), instead of the usual 0–15. Min-max scaling to the 0–1 range
+would map this outlier down to 1 and it would crush all the other values down to
+0–0.15, whereas standardization would not be much affected. Scikit-Learn provides a
+transformer called StandardScaler for standardization.
+
+\tips{If you want to scale a sparse matrix without converting it to a dense matrix first, you can use a StandardScaler with its with\_mean hyperparameter set to False: it will only divide the data by the standard deviation, without subtracting the mean (as this would break sparsity).}
+
+When a feature’s distribution has a heavy tail (i.e., when values far from the mean are not exponentially rare), both min-max scaling and standardization will squash most values into a small range. Machine learning models generally don’t like this at all, as you will see in \autoref{Training Models}. So \textbf{before you scale the feature, you should first transform it to shrink the heavy tail, and if possible to make the distribution roughly symmetrical}. For example, a common way to do this for positive features with a heavy tail to the right is to replace the feature with its square root (or raise the feature to a power between 0 and 1). If the feature has a really long and heavy tail, such as a power law distribution, then replacing the feature with its logarithm may help. For example, the population feature roughly follows a power law: districts with 10,000 inhabitants are only 10 times less frequent than districts with 1,000 inhabitants, not exponentially less frequent. Figure 2-17 shows how much better this feature looks when you compute its log: it’s very close to a Gaussian distribution (i.e., bell-shaped).
+
+
+\subsection{Custom Transformers}
 You will want your transformer to work seamlessly with Scikit-Learn functionalities (such as pipelines), and since Scikit-Learn relies on duck typing (not inheritance), all you need to do is create a class and implement three methods: \verb|fit()|
 (returning \verb|self|), \verb|transform()|, and \verb|fit_transform()|.
