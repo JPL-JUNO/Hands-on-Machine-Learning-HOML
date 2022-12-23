@@ -1,6 +1,7 @@
 \usepackage{amsmath}
 
 \usepackage{mathptmx}
+\usepackage{ctex}
 \usepackage{minted}
 \usepackage{tcolorbox}
 \usepackage{epigraph}
@@ -15,17 +16,12 @@
 \newminted[pyc]{python}{}
 
 
-\title{\textbf{Hands-on
-Machine Learning\\
-with Scikit-Learn,
-Keras \& TensorFlow} \\
-\large Concepts, Tools, and Techniques
-to Build Intelligent Systems
-
-	}
-	
-\author{Stephen CUI\thanks{cuixuanStephen@gmail.com}
+\title{\textbf{Hands-on Machine Learning\\
+with Scikit-Learn, Keras \& TensorFlow} \\
+\large Concepts, Tools, and Techniques to Build Intelligent Systems
 }
+	
+\author{Stephen CUI\thanks{cuixuanStephen@gmail.com}}
 \date{October 30, 2022}
 \newcommand\explain[2]{
 \begin{tcolorbox}[breakable,colback=orange!5,colframe=orange!95!black,title=\textbf{#1}, breakable]
@@ -33,9 +29,9 @@ to Build Intelligent Systems
 \end{tcolorbox}
 }
 
-\newcommand\tips[1]{\textbf{Tips: } #1}
-\newcommand\notes[1]{\textbf{Notes: } #1}
-\newcommand\warning[1]{\textbf{Warning: } #1}
+\newcommand\tips[1]{\textcolor{green!50!black}{\textbf{Tips: } #1}}
+\newcommand\notes[1]{\textcolor{blue!50!black}{\textbf{Notes: } #1}}
+\newcommand\warning[1]{\textcolor{orange!50!black}{\textbf{Warning: } #1}}
 \newcommand\figures[1]{
 \begin{figure}
 \centering
