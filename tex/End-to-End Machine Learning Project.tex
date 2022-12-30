@@ -676,3 +676,259 @@ A custom transformer can (and often does) use other estimators in its implementa
 \figures{Gaussian RBF similarity to the nearest cluster center}
 
 \subsection{Transformation Pipelines}
+As you can see, there are many data transformation steps that need to be executed
+in the right order. Fortunately, Scikit-Learn provides the Pipeline class to help with
+such sequences of transformations.
+
+\begin{pyc}
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+num_pipeline = Pipeline([
+    ('impute', SimpleImputer(strategy='median')),
+    ('standardize', StandardScaler())
+])
+\end{pyc}
+
+The Pipeline constructor takes a list of name/estimator pairs (2-tuples) defining a sequence of steps. The names can be anything you like, as long as they are unique and don't contain double underscores (\_\_). The estimators must all be transformers (i.e., they must have a \verb|fit_transform()| method), except for the last one, which can be anything: a transformer, a predictor, or any other type of estimator.
+
+If you don't want to name the transformers, you can use the \verb|make_pipeline()| function instead; it takes transformers as positional arguments and creates a Pipeline using the names of the transformers' classes, in lowercase and without underscores.
+
+\begin{pyc}
+from sklearn.pipeline import make_pipeline
+num_pipeline = make_pipeline(SimpleImputer(strategy='median'), StandardScaler())
+\end{pyc}
+
+If multiple transformers have the same name, an index is appended to their names.
+
+When you call the pipeline's fit() method, it calls \verb|fit_transform()| sequentially on
+all the transformers, passing the output of each call as the parameter to the next call
+until it reaches the final estimator, for which it just calls the fit() method.
+
+If the last estimator were a predictor instead
+of a transformer, then the pipeline would have a predict() method rather than a
+transform() method. Calling it would sequentially apply all the transformations to
+the data and pass the result to the predictor's predict() method.
+
+\begin{pyc}
+housing_num_prepared = num_pipeline.fit_transform(housing_num)
+housing_num_prepared[: 2].round(2)
+\end{pyc}
+
+It would be more convenient to have a single transformer capable of handling
+all columns, applying the appropriate transformations to each column. For this,
+you can use a \verb|ColumnTransformer|.  Its constructor requires a list of
+triplets (3-tuples), each containing a name (which must be unique and not contain
+double underscores), a transformer, and a list of names (or indices) of columns that
+the transformer should be applied to.
+
+\begin{pyc}
+from sklearn.compose import ColumnTransformer
+
+num_attribs = ['longitude', 'latitude', 'housing_median_age', 'total_rooms',
+               'total_bedrooms', 'population', 'households', 'median_income']
+
+cat_attribs = ['ocean_proximity']
+
+cat_pipeline = make_pipeline(
+    SimpleImputer(strategy='most_frequent'),
+    OneHotEncoder(handle_unknown='ignore')
+)
+
+preprocessing = ColumnTransformer([
+    ('num', num_pipeline, num_attribs),
+    ('cat', cat_pipeline, cat_attribs)
+])
+\end{pyc}
+
+\tips{Instead of using a transformer, you can specify the string "drop"
+if you want the columns to be dropped, or you can specify
+"passthrough" if you want the columns to be left untouched. By
+default, the remaining columns (i.e., the ones that were not listed)
+will be dropped, but you can set the remainder hyperparameter to
+any transformer (or to "passthrough") if you want these columns
+to be handled differently.}
+
+Since listing all the column names is not very convenient, Scikit-Learn provides
+a \verb|make_column_selector()| function that returns a selector function you can use
+to automatically select all the features of a given type, such as numerical or categorical. You can pass this selector function to the ColumnTransformer instead of
+column names or indices. Moreover, if you don't care about naming the transformers, you can use \verb|make_column_transformer()|, which chooses the names for you,
+just like \verb|make_pipeline()| does. 
+
+Once again this returns a NumPy array, but you can get the column names using
+\verb|preprocessing.get_feature_names_out()| and wrap the data in a nice DataFrame
+as we did before.
+
+\warning{
+The OneHotEncoder returns a sparse matrix and the num\_pipeline
+returns a dense matrix. When there is such a mix of sparse and
+dense matrices, the ColumnTransformer estimates the density of the
+final matrix (i.e., the ratio of nonzero cells), and it returns a sparse
+matrix if the density is lower than a given threshold (by default,
+\texttt{sparse\_threshold=0.3}). In this example, it returns a dense matrix.
+}
+
+Let's recap what the pipeline will do and why:
+\begin{itemize}
+    \item 大多数机器学习算法都不太喜欢缺失值，数值型的变量使用中位数进行impute，分类型变量使用频率最高的进行impute；
+    \item 因为大多数机器学习算法只接收数值变量，因此分类变量会被进行one-hot编码；
+    \item A few ratio features will be computed and added: \verb|bedrooms_ratio|,
+    \verb|rooms_per_house|, and \verb|people_per_house|. Hopefully these will better correlate
+    with the median house value, and thereby help the ML models.
+    \item A few cluster similarity features will also be added. These will likely be more
+    useful to the model than latitude and longitude.
+    \item Features with a long tail will be replaced by their logarithm, as most models
+    prefer features with roughly uniform or Gaussian distributions.
+    
+    \item All numerical features will be standardized, as most ML algorithms prefer when
+    all features have roughly the same scale. 
+\end{itemize}
+
+\begin{pyc}
+def column_ratio(X):
+    return X[:, [0]] / X[:, [1]]
+
+def ratio_name(function_transformer, feature_names_in):
+    return ['ratio']
+
+def ratio_pipeline():
+    return make_pipeline(
+        SimpleImputer(strategy='median'),
+        FunctionTransformer(column_ratio, feature_names_out=ratio_name),
+        StandardScaler()
+    )
+    
+log_pipeline = make_pipeline(
+    SimpleImputer(strategy='median'),
+    FunctionTransformer(np.log, feature_names_out='one-to-one'),
+    StandardScaler())
+
+cluster_simil = ClusterSimilarity(n_clusters=10, gamma=1, random_state=42)
+default_num_pipeline = make_pipeline(SimpleImputer(strategy='median'),
+                                      StandardScaler())
+
+preprocessing = ColumnTransformer([
+    ('bedrooms', ratio_pipeline(), ['total_bedrooms', 'total_rooms']),
+    ('rooms_per_house', ratio_pipeline(), ['total_rooms', 'households']),
+    ('people_per_house', ratio_pipeline(), ['population', 'households']),
+    ('log', log_pipeline, ['total_bedrooms', 'total_rooms', 'population', 
+                             'households', 'median_income']),
+    ('geo', cluster_simil, ['latitude', 'longitude']),
+    ('cat', cat_pipeline, make_column_selector(dtype_include=object))
+],
+                                  remainder=default_num_pipeline)
+\end{pyc}
+
+If you run this ColumnTransformer, it performs all the transformations and outputs a
+NumPy array with 24 features.
+\section{Select and Train a Model}
+
+\subsection{Train and Evaluate on the Training Set}
+让我们从最基础的线性模型开始：
+
+\begin{pyc}
+from sklearn.linear_model import LinearRegression
+
+lin_reg = make_pipeline(preprocessing, LinearRegression())
+lin_reg.fit(housing, housing_labels)
+\end{pyc}
+
+\begin{pyc}
+housing_prediction = lin_reg.predict(housing)
+print(housing_prediction[:5].round(-2))
+# -2 = rounded to the nearest hundred
+print(housing_labels.iloc[: 5].values)
+\end{pyc}
+
+Remember that you chose to use the RMSE as your performance
+measure, so you want to measure this regression model's RMSE on the whole training
+set using Scikit-Learn's \verb|mean_squared_error()| function, with the squared argument
+set to False.
+
+\begin{pyc}
+from sklearn.metrics import mean_squared_error
+line_rmse = mean_squared_error(housing_labels, 
+                               housing_prediction,
+                               squared=False)
+line_rmse
+\end{pyc}
+
+This is better than nothing, but clearly not a great score: the \verb|median_housing_values|
+of most districts range between \$120,000 and \$265,000, so a typical prediction error
+of \$68,628 is really not very satisfying. This is an example of a model underfitting the
+training data. When this happens it can mean that the features do not provide enough
+information to make good predictions, or that the model is not powerful enough.
+As we saw in the previous chapter, \textbf{the main ways to fix underfitting are to select a
+more powerful model, to feed the training algorithm with better features, or to reduce
+the constraints on the model}. This model is not regularized, which rules out the last
+option. You could try to add more features, but first you want to try a more complex
+model to see how it does.
+
+我们决定使用更加复杂的决策树回归模型，这个模型更加强大，具有发现数据中非线性关系的的能力，更多见\autoref{Decision Trees}.
+
+\begin{pyc}
+from sklearn.tree import DecisionTreeRegressor
+
+tree_reg = make_pipeline(preprocessing, DecisionTreeRegressor(random_state=42))
+tree_reg.fit(housing, housing_labels)
+
+housing_predictions = tree_reg.predict(housing)
+tree_rmse = mean_squared_error(
+    housing_labels,
+    housing_predictions,
+    squared=False
+)
+# 0
+\end{pyc}
+It is much more likely that the model has badly overfit the data. How can you be sure?
+As you saw earlier, you don’t want to touch the test set until you are ready to launch a
+model you are confident about, \textbf{so you need to use part of the training set for training
+and part of it for model validation}.
+
+\subsection{Better Evaluation Using Cross-Validation}
+One way to evaluate the decision tree model would be to use the \verb|train_test_split()| function to split the training set into a smaller training set and a validation set, then train your models against the smaller training set and evaluate
+them against the validation set. It’s a bit of effort, but nothing too difficult, and it
+would work fairly well.
+
+A great alternative is to use Scikit-Learn’s \emph{k-fold cross-validation} feature.(非常消耗算力)
+\begin{pyc}
+from sklearn.model_selection import cross_val_score
+
+tree_rmses = -cross_val_score(tree_reg, housing, housing_labels,
+                              scoring='neg_root_mean_squared_error',
+                              cv=10)
+pd.Series(tree_rmses).describe()
+\end{pyc}
+\warning{
+    Scikit-Learn’s cross-validation features expect a utility function
+(greater is better) rather than a cost function (lower is better), so
+the scoring function is actually the opposite of the RMSE. It’s a
+negative value, so you need to switch the sign of the output to get
+the RMSE scores.
+}
+
+In fact, it seems to perform almost as poorly as the linear regression model! Notice that cross-validation allows you to get not only an estimate of the performance of your model, but also a measure of how precise this estimate is (i.e., its standard deviation). But cross-validation comes at the cost of training the model several times, so it is not always feasible.
+
+Let’s try one last model now: the RandomForestRegressor. As you will see in \autoref{Ensemble Learning and Random Forests}, random forests work by training many decision trees on random subsets of the features, then averaging out their predictions. Such models composed of many other models are called ensembles: they are capable of boosting the performance of the underlying model (in this case, decision trees). 
+
+\begin{pyc}
+from sklearn.ensemble import RandomForestRegressor
+
+forest_reg = make_pipeline(preprocessing,
+                           RandomForestRegressor(random_state=42))
+forest_rmses = - cross_val_score(forest_reg, 
+                                 housing, 
+                                 housing_labels,
+                                 scoring='neg_root_mean_squared_error',
+                                 cv=10)
+pd.Series(forest_rmses).describe()
+\end{pyc}
+If you train a RandomForest and measure the RMSE on the training set, you will find roughly 17,474: that’s much lower, meaning that there’s still quite a lot of overfitting going on.(The training error is much lower than the validation error, which usually means that the model has overfit the training set.) Possible solutions are to simplify the model, constrain
+it (i.e., regularize it), or get a lot more training data. Before you dive much deeper
+into random forests, however, you should try out many other models from various
+categories of machine learning algorithms (e.g., several support vector machines with
+different kernels, and possibly a neural network), without spending too much time
+tweaking the hyperparameters. The goal is to shortlist a few (two to five) promising
+models.(在进行调参之前，应该试试更多的模型，而不是一头扎进调参)
+
+\subsection{Fine-Tune Your Model}
