@@ -24,14 +24,31 @@ with Scikit-Learn, Keras \& TensorFlow} \\
 \author{Stephen CUI\thanks{cuixuanStephen@gmail.com}}
 \date{October 30, 2022}
 \newcommand\explain[2]{
-\begin{tcolorbox}[breakable,colback=orange!5,colframe=orange!95!black,title=\textbf{#1}, breakable]
+\begin{tcolorbox}[breakable,colback=orange!5,colframe=orange!95!black,title=\textbf{#1}]
 #2
 \end{tcolorbox}
 }
 
-\newcommand\tips[1]{\textcolor{green!70!black}{\textbf{Tips: } #1}}
-\newcommand\notes[1]{\textcolor{blue!70!black}{\textbf{Notes: } #1}}
-\newcommand\warning[1]{\textcolor{orange!90!black}{\textbf{Warnings: } #1}}
+\newcommand\tips[1]{
+	\begin{tcolorbox}[breakable, colback=green!7, colframe=green!70!black,title=Suggestions]
+		#1
+	\end{tcolorbox}
+}
+
+\newcommand\notes[1]{
+	\begin{tcolorbox}[breakable, colback=blue!7, colframe=blue!70!black,title=Notes]
+		#1
+	\end{tcolorbox}
+}
+
+\newcommand\warning[1]{
+	\begin{tcolorbox}[breakable, colback=red!7, colframe=red!70!black,title=Warnings]
+		#1
+	\end{tcolorbox}
+}
+% \newcommand\tips[1]{\textcolor{green!70!black}{\textbf{Tips: } #1}}
+% \newcommand\notes[1]{\textcolor{blue!70!black}{\textbf{Notes: } #1}}
+% \newcommand\warning[1]{\textcolor{orange!90!black}{\textbf{Warnings: } #1}}
 \newcommand\figures[1]{
 \begin{figure}
 \centering
@@ -62,6 +79,11 @@ with Scikit-Learn, Keras \& TensorFlow} \\
 \geometry{left=2.45cm,right=2.45cm, top=2.77cm, bottom=2.77cm}
 
 \usepackage{hyperref}
+% 将引用的chapter改写为Chapter
+\usepackage[english]{babel}
+\addto\extrasenglish{
+	\def\chapterautorefname{Chapter}
+}
 \hypersetup{
 	colorlinks=true,
 	linkcolor=orange!95!black,
@@ -69,4 +91,5 @@ with Scikit-Learn, Keras \& TensorFlow} \\
 	urlcolor=orange!80!white,
 	citecolor=green,
 }
+
 
