@@ -164,7 +164,7 @@ Lastly, it is good practice to list and verify the assumptions that have been ma
 district prices that your system outputs are going to be fed into a downstream
 Machine Learning system, and you assume that these prices are going to be used as
 such. But what if the downstream system converts the prices into categories (e.g.,
-“cheap,” “medium,” or “expensive”) and then uses those categories instead of the pri‐
+``cheap,” ``medium,” or ``expensive”) and then uses those categories instead of the pri‐
 ces themselves? In this case, getting the price perfectly right is not important at all;
 your system just needs to get the category right. If that's so, then the problem should
 have been framed as a classification task, not a regression task. You don't want to find
@@ -463,9 +463,9 @@ corr_matrix['median_house_value'].sort_values(ascending=False)
 \autoref{Standard correlation coefficient of various datasets} shows various plots along with the correlation coefficient between their horizontal and vertical axes.
 
 \figures{Standard correlation coefficient of various datasets}
-\warning{The correlation coefficient only measures linear correlations (“if x
+\warning{The correlation coefficient only measures linear correlations (``if x
 goes up, then y generally goes up/down”). It may completely miss
-out on nonlinear relationships (e.g., “if x is close to 0, then y generally goes up”). }
+out on nonlinear relationships (e.g., ``if x is close to 0, then y generally goes up”). }
 
 Another way to check for correlation between attributes is to use the pandas
 \verb|scatter_matrix()| function, which plots every numerical attribute against every other numerical attribute(\href{https://github.com/JPL-JUNO/HOML/blob/main/chapter/chapter2.ipynb}{You can see here}).
@@ -499,7 +499,7 @@ You can get the list of categories using the \verb|categories_| instance variabl
 containing a 1D array of categories for each categorical attribute (in this case, a list
 containing a single array since there is just one categorical attribute):
 
-One issue with this representation is that ML algorithms will assume that two nearby values are more similar than two distant values. This may be fine in some cases (e.g., for ordered categories such as “bad,” “average,” “good,” and “excellent”), but it is obviously not the case for the \verb|ocean_proximity| column (for example, categories 0 and 4 are clearly more similar than categories 0 and 1). To fix this issue, a common solution is to create one binary attribute per category: one attribute equal to 1 when the category is “$\textless$1H OCEAN” (and 0 otherwise), another attribute equal to 1 when the category is “INLAND” (and 0 otherwise), and so on. This is called one-hot encoding,
+One issue with this representation is that ML algorithms will assume that two nearby values are more similar than two distant values. This may be fine in some cases (e.g., for ordered categories such as ``bad,” ``average,” ``good,” and ``excellent”), but it is obviously not the case for the \verb|ocean_proximity| column (for example, categories 0 and 4 are clearly more similar than categories 0 and 1). To fix this issue, a common solution is to create one binary attribute per category: one attribute equal to 1 when the category is ``$\textless$1H OCEAN” (and 0 otherwise), another attribute equal to 1 when the category is ``INLAND” (and 0 otherwise), and so on. This is called one-hot encoding,
 because only one attribute will be equal to 1 (hot), while the others will be 0 (cold).
 The new attributes are sometimes called dummy attributes. Scikit-Learn provides a
 OneHotEncoder class to convert categorical values into one-hot vectors:
@@ -881,16 +881,16 @@ tree_rmse = mean_squared_error(
 # 0
 \end{pyc}
 It is much more likely that the model has badly overfit the data. How can you be sure?
-As you saw earlier, you don’t want to touch the test set until you are ready to launch a
+As you saw earlier, you don't want to touch the test set until you are ready to launch a
 model you are confident about, \textbf{so you need to use part of the training set for training
 and part of it for model validation}.
 
 \subsection{Better Evaluation Using Cross-Validation}
 One way to evaluate the decision tree model would be to use the \verb|train_test_split()| function to split the training set into a smaller training set and a validation set, then train your models against the smaller training set and evaluate
-them against the validation set. It’s a bit of effort, but nothing too difficult, and it
+them against the validation set. It's a bit of effort, but nothing too difficult, and it
 would work fairly well.
 
-A great alternative is to use Scikit-Learn’s \emph{k-fold cross-validation} feature.(非常消耗算力)
+A great alternative is to use Scikit-Learn's \emph{k-fold cross-validation} feature.(非常消耗算力)
 \begin{pyc}
 from sklearn.model_selection import cross_val_score
 
@@ -900,16 +900,16 @@ tree_rmses = -cross_val_score(tree_reg, housing, housing_labels,
 pd.Series(tree_rmses).describe()
 \end{pyc}
 \warning{
-    Scikit-Learn’s cross-validation features expect a utility function
+    Scikit-Learn's cross-validation features expect a utility function
 (greater is better) rather than a cost function (lower is better), so
-the scoring function is actually the opposite of the RMSE. It’s a
+the scoring function is actually the opposite of the RMSE. It's a
 negative value, so you need to switch the sign of the output to get
 the RMSE scores.
 }
 
 In fact, it seems to perform almost as poorly as the linear regression model! Notice that cross-validation allows you to get not only an estimate of the performance of your model, but also a measure of how precise this estimate is (i.e., its standard deviation). But cross-validation comes at the cost of training the model several times, so it is not always feasible.
 
-Let’s try one last model now: the RandomForestRegressor. As you will see in \autoref{Ensemble Learning and Random Forests}, random forests work by training many decision trees on random subsets of the features, then averaging out their predictions. Such models composed of many other models are called ensembles: they are capable of boosting the performance of the underlying model (in this case, decision trees). 
+Let's try one last model now: the RandomForestRegressor. As you will see in \autoref{Ensemble Learning and Random Forests}, random forests work by training many decision trees on random subsets of the features, then averaging out their predictions. Such models composed of many other models are called ensembles: they are capable of boosting the performance of the underlying model (in this case, decision trees). 
 
 \begin{pyc}
 from sklearn.ensemble import RandomForestRegressor
@@ -923,15 +923,202 @@ forest_rmses = - cross_val_score(forest_reg,
                                  cv=10)
 pd.Series(forest_rmses).describe()
 \end{pyc}
-If you train a RandomForest and measure the RMSE on the training set, you will find roughly 17,474: that’s much lower, meaning that there’s still quite a lot of overfitting going on.(The training error is much lower than the validation error, which usually means that the model has overfit the training set.) Possible solutions are to simplify the model, constrain
-it (i.e., regularize it), or get a lot more training data. Before you dive much deeper
-into random forests, however, you should try out many other models from various
-categories of machine learning algorithms (e.g., several support vector machines with
-different kernels, and possibly a neural network), without spending too much time
-tweaking the hyperparameters. The goal is to shortlist a few (two to five) promising
-models.(在进行调参之前，应该试试更多的模型，而不是一头扎进调参)
+If you train a RandomForest and measure the RMSE on the training set, you will find roughly 17,474: that's much lower, meaning that there's still quite a lot of overfitting going on.(The training error is much lower than the validation error, which usually means that the model has overfit the training set.) Possible solutions are to simplify the model, constrain it (i.e., regularize it), or get a lot more training data. Before you dive much deeper into random forests, however, you should try out many other models from various categories of machine learning algorithms (e.g., several support vector machines with different kernels, and possibly a neural network), without spending too much time tweaking the hyperparameters. The goal is to shortlist a few (two to five) promising models.(在进行调参之前，应该试试更多的模型，而不是一头扎进调参)
 
 \section{Fine-Tune Your Model}
+假设你已经有了一些想要建立的模型清单，你现在需要调整优化参数，来看一下怎么做。
+\subsection{Grid Search}
+最最不智能的方法就是在参数可行集上慢慢的测试，但这几乎是不可能的。Instead, you can use Scikit-Learn's \verb|GridSearchCV| class to search for you. All you need to do is tell it which hyperparameters you want it to experiment with and what values to try out, and it will use cross-validation to evaluate all the possible combinations of hyperparameter values. 
+\begin{pyc}
+from sklearn.model_selection import GridSearchCV
 
+full_pipeline = Pipeline([
+    ('preprocessing', preprocessing),
+    ('random_forest', RandomForestRegressor(random_state=42))
+])
+
+param_grid = [
+    {'preprocessing__geo__n_clusters': [5, 8, 10],
+     'random_forest__max_features': [4, 6, 8]},
+    {'preprocessing__geo__n_clusters': [10, 15],
+     'random_forest__max_features': [6, 8, 10]},
+]
+
+grid_search = GridSearchCV(full_pipeline, param_grid, cv=3,
+                           scoring='neg_root_mean_squared_error')
+grid_search.fit(housing, housing_labels)
+\end{pyc}
+Notice that you can refer to any hyperparameter of any estimator in a pipeline,
+even if this estimator is nested deep inside several pipelines and column transformers. 
+
+For example, when Scikit-Learn sees ``\verb|preprocessing__geo__n_clusters|", it
+splits this string at the double underscores, then it looks for an estimator named
+``\verb|preprocessing|" in the pipeline and finds the preprocessing ColumnTransformer.
+Next, it looks for a transformer named ``geo" inside this ColumnTransformer and
+finds the ClusterSimilarity transformer we used on the latitude and longitude
+attributes. Then it finds this transformer's \verb|n_clusters| hyperparameter. Similarly,
+\verb|random_forest__max_features| refers to the \verb|max_features| hyperparameter of the
+estimator named ``\verb|random_forest|", which is of course the RandomForest model (the
+\verb|max_features| hyperparameter will be explained in \autoref{Ensemble Learning and Random Forests} \nameref{Ensemble Learning and Random Forests}).
+
+\tips{
+    Wrapping preprocessing steps in a Scikit-Learn pipeline allows you to tune the preprocessing hyperparameters along with the model hyperparameters. This is a good thing since they often interact. For example, perhaps increasing n\_clusters requires increasing max\_features as well. If fitting the pipeline transformers is computationally expensive, you can set the pipeline's memory hyperparameter to the path of a caching directory: when you first fit the pipeline, Scikit-Learn will save the fitted transformers to this directory. If you then fit the pipeline again with the same hyperparameters, Scikit-Learn will just load the cached transformers.
+}
+
+整个网格搜索会在两个字典指定的参数上共训练15（$3\times 3$和$2\times 3$）次，每次进行3次交叉验证。The best model is obtained by setting \verb|n_clusters| to 15 and setting \verb|max_features| to 6. 但是需要注意的是\verb|n_clusters|达到了指定的最大值，你可能需要尝试更大的以获取更好的模型性能
+
+\begin{pyc}
+grid_search.best_params_
+\end{pyc}
+
+You can access the best estimator using \verb|grid_search.best_estimator_|. If
+\verb|GridSearchCV| is initialized with \verb|refit=True| (which is the default), then once it finds
+the best estimator using cross-validation, it retrains it on the whole training set. This
+is usually a good idea, since feeding it more data will likely improve its performance.
+
+The evaluation scores are available using \verb|grid_search.cv_results_|, which is a dictionary.
+
+\begin{pyc}
+cv_res = pd.DataFrame(grid_search.cv_results_)
+cv_res.sort_values(by='mean_test_score', ascending=False, inplace=True)
+cv_res = cv_res[['param_preprocessing__geo__n_clusters',
+                 'param_random_forest__max_features',
+                 'split0_test_score',
+                 'split1_test_score',
+                 'split2_test_score',
+                 'mean_test_score']]
+score_cols = ['split0', 'split1', 'split2', 'mean_test_rmse']
+cv_res.columns = ['n_clusters', 'max_features'] + score_cols
+cv_res[score_cols] = - cv_res[score_cols].round().astype(np.int64)
+cv_res.head()
+\end{pyc}
+
+\subsection{Randomized Search}
+The grid search approach is fine when you are exploring relatively few combinations,
+like in the previous example, but \verb|RandomizedSearchCV| is often preferable, especially
+when the hyperparameter search space is large. This class can be used in much
+the same way as the GridSearchCV class, but instead of trying out all possible combinations it evaluates a fixed number of combinations, selecting a random value
+for each hyperparameter at every iteration. This may sound surprising, but this
+approach has several benefits:
+\begin{itemize}
+    \item If some of your hyperparameters are continuous (or discrete but with many
+    possible values), and you let randomized search run for, say, 1,000 iterations, then
+    it will explore 1,000 different values for each of these hyperparameters, whereas
+    grid search would only explore the few values you listed for each one.
+    \item Suppose a hyperparameter does not actually make much difference, but you don't
+    know it yet. If it has 10 possible values and you add it to your grid search, then
+    training will take 10 times longer. But if you add it to a random search, it will not
+    make any difference.(这个理由我似乎不太明白在讲什么)
+    \item If there are 6 hyperparameters to explore, each with 10 possible values, then grid
+    search offers no other choice than training the model a million times, whereas
+    random search can always run for any number of iterations you choose.
+\end{itemize}
+
+\begin{pyc}
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint
+
+param_distribs = {
+    'preprocessing__geo__n_clusters': randint(low=3, high=50),
+    'random_forest__max_features': randint(low=2, high=20)
+}
+
+rnd_search = RandomizedSearchCV(
+    full_pipeline, param_distributions=param_distribs, n_iter=10, cv=3,
+    scoring='neg_root_mean_squared_error', random_state=42
+)
+
+rnd_search.fit(housing, housing_labels)
+\end{pyc}
+
+Scikit-Learn also has \verb|HalvingRandomSearchCV| and \verb|HalvingGridSearchCV| hyperparameter search classes. Their goal is to use the computational resources more efficiently,
+either to train faster or to explore a larger hyperparameter space. Here's how they
+work: in the first round, many hyperparameter combinations (called ``candidates”) are
+generated using either the grid approach or the random approach. These candidates
+are then used to train models that are evaluated using cross-validation, as usual.
+However, training uses limited resources, which speeds up this first round considerably. By default, ``limited resources” means that the models are trained on a small
+part of the training set. However, other limitations are possible, such as reducing
+the number of training iterations if the model has a hyperparameter to set it. Once
+every candidate has been evaluated, only the best ones go on to the second round,
+where they are allowed more resources to compete. After several rounds, the final
+candidates are evaluated using full resources. This may save you some time tuning
+hyperparameters.
+
+在随机网格中，如何去选择超参数的采样分布？
+
+\begin{itemize}
+    \item \verb|scipy.stats.randint(a, b+1)|（\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.randint.html}{随机整数}）: for hyperparameters with discrete values that range from a to b, and all values in that range seem equally likely.
+    \item \verb|scipy.stats.uniform(a, b)|（\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.uniform.html}{均匀分布}）: this is very similar, but for continuous hyperparameters.
+    \item \verb|scipy.stats.geom(1 / scale)|（\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.geom.html}{几何分布}）: for discrete values, when you want to sample roughly in a given scale. E.g., with scale=1000 most samples will be in this ballpark, but about 10\% of all samples will be $\textless 100$ and about 10\% will be $\textgreater 2300$. 就是几何分布中的参数$p$。
+    \item \verb|scipy.stats.expon(scale)|（\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.expon.html}{指数分布}）: this is the continuous equivalent of geom. Just set scale to the most likely value. 指数分布中的参数$\lambda$。
+    \item \verb|scipy.stats.reciprocal(a, b)|（\href{https://docs.scipy.org/doc//scipy-1.3.2/reference/generated/scipy.stats.reciprocal.html}{倒数分布}）: when you have almost no idea what the optimal hyperparameter value's scale is. If you set a=0.01 and b=100, then you're just as likely to sample a value between 0.01 and 0.1 as a value between 10 and 100.
+    $$f(x, a, b)=\frac{1}{xlog(b/a)}$$
+\end{itemize}
+\begin{theorem}[密度变换公式]
+    设随机变量$X$有概率密度函数 $f(x)$, $x \in (a, b)$($a$, $b$ 可以为 $\infty$), 而 $y = g(x)$ 在 $x \in (a, b)$ 上是严格单调的连续函数，存在唯一的反函数$x =  y \in (\alpha, \beta)$ 并且 $h'(y)$ 存在且连续，那么 $Y = g(X)$ 也是连续型随机变量且有概率密度函数
+    $$p(y)=f(h(y))|h'(y)|, ~ y \in (\alpha, \beta).$$  
+\end{theorem}
+
+\subsection{Ensemble Methods}
+Another way to fine-tune your system is to try to combine the models that perform
+best. The group (or ``ensemble”) will often perform better than the best individual
+model. For example, you could train and fine-tune a k-nearest neighbors model, then create
+an ensemble model that just predicts the mean of the random forest prediction and
+that model's prediction. We will cover this topic in more detail in \autoref{Ensemble Learning and Random Forests} \nameref{Ensemble Learning and Random Forests}.
+
+\subsection{Analyzing the Best Models and Their Errors}
+You will often gain good insights on the problem by inspecting the best models. For
+example, the RandomForestRegressor can indicate the relative importance of each
+attribute for making accurate predictions:
+\begin{pyc}
+final_model = rnd_search.best_estimator_
+feature_importances = final_model['random_forest'].feature_importances_
+feature_importances.round(2)
+
+sorted(zip(feature_importances,
+           final_model['preprocessing'].get_feature_names_out()),
+       reverse=True)
+\end{pyc}
+With this information, you may want to try dropping some of the less useful features
+(e.g., apparently only one \verb|ocean_proximity| category is really useful, so you could try
+dropping the others).
+
+\tips{
+    The sklearn.feature\_selection.SelectFromModel transformer
+can automatically drop the least useful features for you: when you
+fit it, it trains a model (typically a random forest), looks at its fea
+ture\_importances\_ attribute, and selects the most useful features.
+Then when you call transform(), it drops the other features.
+}
+You should also look at the specific errors that your system makes, then try to
+understand why it makes them and what could fix the problem: adding extra features
+or getting rid of uninformative ones, cleaning up outliers, etc.
+
+\subsection{Evaluate Your System on the Test Set}
+\begin{pyc}
+X_test = strat_test_set.drop('median_house_value', axis='columns')
+y_test = strat_test_set['median_house_value'].copy()
+
+final_predictions = final_model.predict(X_test)
+
+final_rmse = mean_squared_error(y_test, final_predictions, squared=False)
+final_rmse
+\end{pyc}
+
+In some cases, such a point estimate of the generalization error will not be quite enough to convince you to launch. You might want to have an idea of how precise this estimate is. For this, you can compute a 95\% \emph{confidence interval} for the generalization error using \verb|scipy.stats.t.interval()|.
+
+\begin{pyc}
+from scipy import stats
+confidence = .95
+squared_errors = (final_predictions - y_test) ** 2
+np.sqrt(stats.t.interval(confidence, len(squared_errors) - 1,
+                         loc=squared_errors.mean(),
+                         scale=stats.sem(squared_errors)))
+\end{pyc}
+
+If you did a lot of hyperparameter tuning, the performance will usually be slightly worse than what you measured using cross-validation. That's because your system ends up fine-tuned to perform well on the validation data and will likely not perform as well on unknown datasets. When it happens you must resist the temptation to tweak the hyperparameters to make the numbers look good on the test
+set; the improvements would be unlikely to generalize to new data.
+
+Now comes the project prelaunch phase: you need to present your solution (highlighting what you have learned, what worked and what did not, what assumptions were made, and what your system's limitations are), document everything, and create nice presentations with clear visualizations and easy-to-remember statements (e.g., ``the median income is the number one predictor of housing prices”).
 \section{Launch, Monitor, and Maintain Your System}
 
