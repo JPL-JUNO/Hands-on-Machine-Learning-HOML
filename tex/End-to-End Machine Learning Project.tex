@@ -1121,4 +1121,35 @@ set; the improvements would be unlikely to generalize to new data.
 
 Now comes the project prelaunch phase: you need to present your solution (highlighting what you have learned, what worked and what did not, what assumptions were made, and what your system's limitations are), document everything, and create nice presentations with clear visualizations and easy-to-remember statements (e.g., ``the median income is the number one predictor of housing prices”).
 \section{Launch, Monitor, and Maintain Your System}
+The most basic way to deploy your model to your production environment is just to save the best model you trained, transfer the file to your production environment, and load it. To save the model, you can use the joblib library like this:
 
+\tips{
+    It's often a good idea to save every model you experiment with so that you can come back easily to any model you want. You may also save the cross-validation scores and perhaps the actual predictions on the validation set. This will allow you to easily compare scores across model types, and compare the types of errors they make.
+}
+
+Once your model is transferred to production, you can load it and use it. You must first import any custom classes and functions the model relies on (which means transferring the code to production), then load the model using joblib and use it to make predictions.
+
+But deployment is not the end of the story. You also need to write monitoring code to check your system's live performance at regular intervals and trigger alerts when it drops. 
+
+So, you need to monitor your model's live performance. But how do you do that? Well, it depends. In some cases, the model's performance can be inferred from downstream metrics. 
+
+However, you may also need human analysis to assess the model's performance.
+
+Either way, you need to put in place a monitoring system (with or without human raters to evaluate the live model), as well as all the relevant processes to define what to do in case of failures and how to prepare for them. Unfortunately, this can be a lot of work. In fact, it is often much more work than building and training a model. 无论哪种方法，监控模型似乎要比训练模型更花费功夫。
+
+If the data keeps evolving, you will need to update your datasets and retrain your model regularly. You should probably automate the whole process as much as possible. Here are a few things you can automate:
+\begin{itemize}
+    \item Collect fresh data regularly and label it (e.g., using human raters).
+    \item Write a script to train the model and fine-tune the hyperparameters automatically. This script could run automatically, for example every day or every week, depending on your needs.
+    \item Write another script that will evaluate both the new model and the previous model on the updated test set, and deploy the model to production if the performance has not decreased (if it did, make sure you investigate why). The script should probably test the performance of your model on various subsets of the test set, such as poor or rich districts, rural or urban districts, etc.
+\end{itemize}
+
+You should also make sure you evaluate the model's input data quality. Sometimes performance will degrade slightly because of a poor-quality signal (e.g., a malfunctioning sensor sending random values, or another team's output becoming stale), but it may take a while before your system's performance degrades enough to trigger an alert. If you monitor your model's inputs, you may catch this earlier. 低质量的数据输入可能也会导致模型的性能变差。
+
+Finally, make sure you keep backups of every model you create and have the process and tools in place to roll back to a previous model quickly, in case the new model starts failing badly for some reason. Similarly, you should keep backups of every version of your datasets so that you can roll back to a previous dataset if the new one ever gets corrupted. Having backups of your datasets also allows you to evaluate any model against any previous dataset. 记得备份模型以及相关数据。
+
+As you can see, machine learning involves quite a lot of infrastructure. \autoref{Training and Deploying TensorFlow Models at Scale} \nameref{Training and Deploying TensorFlow Models at Scale} discusses some aspects of this, but it's a very broad topic called \emph{ML Operations(MLOps)}, which deserves its own book. 机器学习设计很多的基础设施，这里可能涉及到ML Operations。
+\section{Try It Out!}
+Hopefully this chapter gave you a good idea of what a machine learning project looks like as well as showing you some of the tools you can use to train a great system. As you can see, much of the work is in the data preparation step: building monitoring tools, setting up human evaluation pipelines, and automating regular model training. The machine learning algorithms are important, of course, but it is probably prefera ble to be comfortable with the overall process and know three or four algorithms well rather than to spend all your time exploring advanced algorithms.
+
+A good place to start is on a competition website such as \href{https://www.kaggle.com/}{Kaggle}: you will have a dataset to play with, a clear goal, and people to share the experience with. Have fun!
