@@ -35,3 +35,8 @@ Contributor(s): Stephen CUI
    - Autoencoders, GANs, and Diffusion Models
    - Reinforcement Learning
    - Training and Deploying TensorFlow Models at Scale
+3. Appendices
+   - Machine Learning Project Checklist
+   - Autodif
+   - Special Data Structures
+   - TensorFlow Graphs
