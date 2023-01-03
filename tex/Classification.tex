@@ -1,1 +1,74 @@
 \chapter{Classification\label{Classification}}
+Now we will turn our attention to classification systems.
+
+\section{MNIST}
+In this chapter we will be using the MNIST dataset, which is a set of 70,000 small images of digits handwritten by high school students and employees of the US Census Bureau. Each image is labeled with the digit it represents. This set has been studied so much that it is often called the “hello world” of machine learning: whenever people come up with a new classification algorithm they are curious to see how it will perform on MNIST, and anyone who learns machine learning tackles this dataset sooner or later.
+
+Scikit-Learn provides many helper functions to download popular datasets. The following code fetches the MNIST dataset from \href{https://www.openml.org/}{OpenML.org}: 
+\begin{pyc}
+from sklearn.datasets import fetch_openml
+mnist = fetch_openml('mnist_784', as_frame=False)
+\end{pyc}
+
+The sklearn.datasets package contains mostly three types of functions: 
+\begin{itemize}
+    \item \verb|fetch_*| functions such as \verb|fetch_openml()| to download real-life datasets;
+    \item \verb|load_*| functions to load small toy datasets bundled with Scikit-Learn (so they don’t need to be downloaded over the internet);
+    \item \verb|make_*| functions to generate fake datasets, useful for tests;
+\end{itemize}
+
+Generated datasets are usually returned as an (X, y) tuple containing the input data and the targets, both as NumPy arrays. Other datasets are returned as sklearn.utils.Bunch objects, which are dictionaries whose entries can also be accessed as attributes. They generally contain the following entries:
+
+\begin{itemize}
+    \item \verb|DESCR|: A description of the dataset
+    \item \verb|data|: The input data, usually as a 2D NumPy array
+    \item \verb|target|: The labels, usually as a 1D NumPy array
+\end{itemize}
+
+The \verb|fetch_openml()| function is a bit unusual since by default it returns the inputs as a Pandas DataFrame and the labels as a Pandas Series (unless the dataset is sparse). But the MNIST dataset contains images, and DataFrames aren’t ideal for that, so it’s preferable to set \verb|as_frame=False| to get the data as NumPy arrays instead. Let’s look at these arrays:
+
+\begin{pyc}
+X, y = mnist.data, mnist.target
+X.shape, y.shape
+\end{pyc}
+There are 70,000 images, and each image has 784 features. This is because each image is $28 \times 28$ pixels, and each feature simply represents one pixel’s intensity, from 0 (white) to 255 (black).  Let’s take a peek at one digit from the dataset (\autoref{Example of an MNIST image}).
+
+\begin{pyc}
+import matplotlib.pyplot as plt
+
+def plot_digit(image_data):
+    image = image_data.reshape(28, 28)
+    plt.imshow(image, cmap='binary')
+    plt.axis('off')
+    
+some_digit = X[0]
+plot_digit(some_digit)
+\end{pyc}
+
+\figures{Example of an MNIST image}
+
+To give you a feel for the complexity of the classification task, \autoref{Digits from the MNIST dataset} shows a few more images from the MNIST dataset.
+
+在你进一步了解数据的时候，你应该将数据切分为训练集和测试集。The MNIST dataset returned by \verb|fetch_openml()| is actually already split into a training set (the first 60,000 images) and a test set (the last 10,000 images)\footnote{Datasets returned by \texttt{fetch\_openml()} are not always shuffled or split.}:
+\begin{pyc}
+X_train, X_test, y_train, y_test = X[:60_000], X[60_000:], y[:60_000], y[60_000:]
+\end{pyc}
+\figures{Digits from the MNIST dataset}
+
+\section{Training a Binary Classifier}
+
+\section{Performance Measures}
+\subsection{Measuring Accuracy Using Cross-Validation}
+\subsection{Confusion Matrices}
+\subsection{Precision and Recall}
+\subsection{The Precision/Recall Trade-off}
+\subsection{The ROC Curve}
+\section{Multiclass Classification}
+\subsection{}
+\subsection{}
+\section{}
+\subsection{}
+\subsection{}
+\section{}
+\section{}
+\section{}
