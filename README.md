@@ -6,9 +6,9 @@
 
 <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125967/"><img src="https://learning.oreilly.com/library/cover/9781098125967/250w/"></a>
 
-**Status: Updating(更新中)**
+## Contributors
 
-Contributor(s): Stephen CUI
+- [Stephen CUI](https://github.com/JPL-JUNO)
 
 ## 内容
 
@@ -40,3 +40,7 @@ Contributor(s): Stephen CUI
    - Autodif
    - Special Data Structures
    - TensorFlow Graphs
+
+## Status
+
+- Updating（更新中）
