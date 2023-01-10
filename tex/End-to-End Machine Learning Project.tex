@@ -1129,6 +1129,10 @@ The most basic way to deploy your model to your production environment is just t
 
 Once your model is transferred to production, you can load it and use it. You must first import any custom classes and functions the model relies on (which means transferring the code to production), then load the model using joblib and use it to make predictions.
 
+\figures{A model deployed as a web service and used by a web application}
+
+You can wrap the model within a dedicated web service that your web application can query through a REST API13\footnote{In a nutshell, a REST (or RESTful) API is an HTTP-based API that follows some conventions, such as using standard HTTP verbs to read, update, create, or delete resources (GET, POST, PUT, and DELETE) and using JSON for the inputs and outputs.} (see \autoref{A model deployed as a web service and used by a web application}).
+
 But deployment is not the end of the story. You also need to write monitoring code to check your system's live performance at regular intervals and trigger alerts when it drops. 
 
 So, you need to monitor your model's live performance. But how do you do that? Well, it depends. In some cases, the model's performance can be inferred from downstream metrics. 
