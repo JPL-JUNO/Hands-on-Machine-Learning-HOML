@@ -4,13 +4,13 @@ Now we will turn our attention to classification systems.
 \section{MNIST}
 In this chapter we will be using the MNIST dataset, which is a set of 70,000 small images of digits handwritten by high school students and employees of the US Census Bureau. Each image is labeled with the digit it represents. This set has been studied so much that it is often called the ``hello world” of machine learning: whenever people come up with a new classification algorithm they are curious to see how it will perform on MNIST, and anyone who learns machine learning tackles this dataset sooner or later.
 
-Scikit-Learn provides many helper functions to download popular datasets. The following code fetches the MNIST dataset from \href{https://www.openml.org/}{OpenML.org}: 
+Scikit-Learn provides many helper functions to download popular datasets. The following code fetches the MNIST dataset from \href{https://www.openml.org/}{OpenML.org}:
 \begin{pyc}
-from sklearn.datasets import fetch_openml
-mnist = fetch_openml('mnist_784', as_frame=False)
+    from sklearn.datasets import fetch_openml
+    mnist = fetch_openml('mnist_784', as_frame=False)
 \end{pyc}
 
-The sklearn.datasets package contains mostly three types of functions: 
+The sklearn.datasets package contains mostly three types of functions:
 \begin{itemize}
     \item \verb|fetch_*| functions such as \verb|fetch_openml()| to download real-life datasets;
     \item \verb|load_*| functions to load small toy datasets bundled with Scikit-Learn (so they don't need to be downloaded over the internet);
@@ -28,21 +28,21 @@ Generated datasets are usually returned as an (X, y) tuple containing the input 
 The \verb|fetch_openml()| function is a bit unusual since by default it returns the inputs as a Pandas DataFrame and the labels as a Pandas Series (unless the dataset is sparse). But the MNIST dataset contains images, and DataFrames aren't ideal for that, so it's preferable to set \verb|as_frame=False| to get the data as NumPy arrays instead. Let's look at these arrays:
 
 \begin{pyc}
-X, y = mnist.data, mnist.target
-X.shape, y.shape
+    X, y = mnist.data, mnist.target
+    X.shape, y.shape
 \end{pyc}
 There are 70,000 images, and each image has 784 features. This is because each image is $28 \times 28$ pixels, and each feature simply represents one pixel's intensity, from 0 (white) to 255 (black).  Let's take a peek at one digit from the dataset (\autoref{Example of an MNIST image}).
 
 \begin{pyc}
-import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
 
-def plot_digit(image_data):
+    def plot_digit(image_data):
     image = image_data.reshape(28, 28)
     plt.imshow(image, cmap='binary')
     plt.axis('off')
-    
-some_digit = X[0]
-plot_digit(some_digit)
+
+    some_digit = X[0]
+    plot_digit(some_digit)
 \end{pyc}
 
 \figures{Example of an MNIST image}
@@ -51,65 +51,65 @@ To give you a feel for the complexity of the classification task, \autoref{Digit
 
 在你进一步了解数据的时候，你应该将数据切分为训练集和测试集。The MNIST dataset returned by \verb|fetch_openml()| is actually already split into a training set (the first 60,000 images) and a test set (the last 10,000 images)\footnote{Datasets returned by \texttt{fetch\_openml()} are not always shuffled or split.}:
 \begin{pyc}
-X_train, X_test, y_train, y_test = X[:60_000], X[60_000:], y[:60_000], y[60_000:]
+    X_train, X_test, y_train, y_test = X[:60_000], X[60_000:], y[:60_000], y[60_000:]
 \end{pyc}
 \figures{Digits from the MNIST dataset}
 
 \section{Training a Binary Classifier}
 Let's simplify the problem for now and only try to identify one digit—for example, the number 5.
 \begin{pyc}
-y_train_5 = (y_train == '5')
-y_test_5 = (y_test == '5')
+    y_train_5 = (y_train == '5')
+    y_test_5 = (y_test == '5')
 \end{pyc}
 Now let's pick a classifier and train it. A good place to start is with a \emph{stochastic gradient descent} (SGD, or stochastic GD) classifier, using Scikit-Learn's SGDClassifier class. This classifier is capable of handling very large datasets efficiently. This is in part because SGD deals with training instances independently, one at a time, which also makes SGD well suited for online learning, as you will see later.
 
 \begin{pyc}
-from sklearn.linear_model import SGDClassifier
+    from sklearn.linear_model import SGDClassifier
 
-sgd_clf = SGDClassifier(random_state=42)
-sgd_clf.fit(X_train, y_train_5)
+    sgd_clf = SGDClassifier(random_state=42)
+    sgd_clf.fit(X_train, y_train_5)
 \end{pyc}
 Now we can use it to detect images of the number 5:
 \begin{pyc}
-sgd_clf.predict([some_digit])
+    sgd_clf.predict([some_digit])
 \end{pyc}
 \section{Performance Measures}
 Evaluating a classifier is often significantly trickier than evaluating a regressor, so we will spend a large part of this chapter on this topic. There are many performance measures available, so grab another coffee and get ready to learn a bunch of new concepts and acronyms!
 \subsection{Measuring Accuracy Using Cross-Validation}
 A good way to evaluate a model is to use cross-validation, just as you did in \autoref{End-to-End Machine Learning Project} \nameref{End-to-End Machine Learning Project}.
 \begin{pyc}
-from sklearn.model_selection import cross_val_score
+    from sklearn.model_selection import cross_val_score
 
-cross_val_score(sgd_clf, X_train, y_train_5, cv=3, scoring='accuracy')
+    cross_val_score(sgd_clf, X_train, y_train_5, cv=3, scoring='accuracy')
 \end{pyc}
 
 Wow! Above 95\% accuracy (ratio of correct predictions) on all cross-validation folds? This looks amazing, doesn't it? Well, before you get too excited, let's look at \textbf{a dummy classifier that just classifies every single image in the most frequent class}, which in this case is the negative class (i.e., non 5):
 
 \begin{pyc}
-from sklearn.dummy import DummyClassifier
+    from sklearn.dummy import DummyClassifier
 
-dummy_clf = DummyClassifier()
-dummy_clf.fit(X_train, y_train_5)
-print(any(dummy_clf.predict(X_train)))
+    dummy_clf = DummyClassifier()
+    dummy_clf.fit(X_train, y_train_5)
+    print(any(dummy_clf.predict(X_train)))
 
-cross_val_score(dummy_clf, X_train, y_train_5, cv=3, scoring='accuracy')
+    cross_val_score(dummy_clf, X_train, y_train_5, cv=3, scoring='accuracy')
 \end{pyc}
 
-That's right, it has over 90\% accuracy! This is simply because only about 10\% of the images are 5s, so if you always guess that an image is not a 5, you will be right about 90\% of the time. 
+That's right, it has over 90\% accuracy! This is simply because only about 10\% of the images are 5s, so if you always guess that an image is not a 5, you will be right about 90\% of the time.
 
 This demonstrates why accuracy is generally not the preferred performance measure for classifiers, especially when you are dealing with skewed datasets (i.e., when some classes are much more frequent than others). A much better way to evaluate the performance of a classifier is to look at the \emph{confusion matrix} (CM). 当数据是不平衡时，使用准确率accuracy来评价模型时不合理的。
 
 \explain{Implementing Cross-Validation}{
-Occasionally you will need more control over the cross-validation process than what Scikit-Learn provides off the shelf. In these cases, you can implement cross-validation yourself. The following code does roughly the same thing as Scikit-Learn's \texttt{cross\_val\_score()} function, and it prints the same result.
+    Occasionally you will need more control over the cross-validation process than what Scikit-Learn provides off the shelf. In these cases, you can implement cross-validation yourself. The following code does roughly the same thing as Scikit-Learn's \texttt{cross\_val\_score()} function, and it prints the same result.
 
-The StratifiedKFold class performs stratified sampling (分层抽样) to produce folds that contain a representative ratio of each class. At each iteration the code creates a clone of the classifier, trains that clone on the training folds, and makes predictions on the test fold. Then it counts the number of correct predictions and outputs the ratio of correct predictions.}
+    The StratifiedKFold class performs stratified sampling (分层抽样) to produce folds that contain a representative ratio of each class. At each iteration the code creates a clone of the classifier, trains that clone on the training folds, and makes predictions on the test fold. Then it counts the number of correct predictions and outputs the ratio of correct predictions.}
 \begin{pyc}
-from sklearn.model_selection import StratifiedKFold
-from sklearn.base import clone
+    from sklearn.model_selection import StratifiedKFold
+    from sklearn.base import clone
 
-skfolds = StratifiedKFold(n_splits=3)
+    skfolds = StratifiedKFold(n_splits=3)
 
-for train_index, test_index in skfolds.split(X_train, y_train_5):
+    for train_index, test_index in skfolds.split(X_train, y_train_5):
     clone_clf = clone(sgd_clf)
     X_train_folds = X_train[train_index]
     y_train_folds = y_train_5[train_index]
@@ -123,13 +123,13 @@ for train_index, test_index in skfolds.split(X_train, y_train_5):
 \end{pyc}
 
 \subsection{Confusion Matrices}
-The general idea of a confusion matrix is to count the number of times instances of class A are classified as class B, for all A/B pairs. 
+The general idea of a confusion matrix is to count the number of times instances of class A are classified as class B, for all A/B pairs.
 
 To compute the confusion matrix, you first need to have a set of predictions so that they can be compared to the actual targets. You could make predictions on the test set, but it's best to keep that untouched for now. Instead, you can use the \verb|cross_val_predict()| function:
 \begin{pyc}
-from sklearn.model_selection import cross_val_predict
+    from sklearn.model_selection import cross_val_predict
 
-y_train_pred = cross_val_predict(sgd_clf, X_train, y_train_5, cv=3)
+    y_train_pred = cross_val_predict(sgd_clf, X_train, y_train_5, cv=3)
 \end{pyc}
 
 Just like the \verb|cross_val_score()| function, \verb|cross_val_predict()| performs k-fold cross-validation, but instead of returning the evaluation scores, it returns the predictions made on each test fold. This means that you get a clean prediction for each instance in the training set (by ``clean” I mean ``out-of-sample”: the model makes predictions on data that it never saw during training).
@@ -137,12 +137,12 @@ Just like the \verb|cross_val_score()| function, \verb|cross_val_predict()| perf
 Now you are ready to get the confusion matrix using the \verb|confusion_matrix()| function. Just pass it the target classes (\verb|y_train_5|) and the predicted classes
 (\verb|y_train_pred|):
 \begin{pyc}
-from sklearn.metrics import confusion_matrix
+    from sklearn.metrics import confusion_matrix
 
-cm = confusion_matrix(y_train_5, y_train_pred)
-cm
+    cm = confusion_matrix(y_train_5, y_train_pred)
+    cm
 \end{pyc}
-Each row in a confusion matrix represents an actual class, while each column represents a predicted class. The first row of this matrix considers non-5 images (the \emph{negative class}): 53,892 of them were correctly classified as non-5s (they are called \emph{true negatives}, TN), while the remaining 687 were wrongly classified as 5s (\emph{false positives}, FP, also called \emph{type I errors}). The second row considers the images of 5s (the \emph{positive class}): 1,891 were wrongly classified as non-5s (\emph{false negatives}, FN, also called \emph{type II errors}), while the remaining 3,530 were correctly classified as 5s (\emph{true positives}, TP). 
+Each row in a confusion matrix represents an actual class, while each column represents a predicted class. The first row of this matrix considers non-5 images (the \emph{negative class}): 53,892 of them were correctly classified as non-5s (they are called \emph{true negatives}, TN), while the remaining 687 were wrongly classified as 5s (\emph{false positives}, FP, also called \emph{type I errors}). The second row considers the images of 5s (the \emph{positive class}): 1,891 were wrongly classified as non-5s (\emph{false negatives}, FN, also called \emph{type II errors}), while the remaining 3,530 were correctly classified as 5s (\emph{true positives}, TP).
 
 Sometimes you may prefer a more concise metric. An interesting one to look at is the accuracy of the positive predictions; this is called the \emph{precision} of the classifier (\autoref{precision}).
 \begin{equation}\label{precision}
@@ -156,10 +156,10 @@ Precision is typically used along with another metric named \emph{recall}, also 
 \subsection{Precision and Recall}
 Scikit-Learn provides several functions to compute classifier metrics, including precision and recall:
 \begin{pyc}
-from sklearn.metrics import precision_score, recall_score
+    from sklearn.metrics import precision_score, recall_score
 
-print(precision_score(y_train_5, y_train_pred))
-print(recall_score(y_train_5, y_train_pred))
+    print(precision_score(y_train_5, y_train_pred))
+    print(recall_score(y_train_5, y_train_pred))
 \end{pyc}
 
 Now our 5-detector does not look as shiny as it did when we looked at its accuracy. When it claims an image represents a 5, it is correct only 83.7\% of the time. Moreover, it only detects 65.1\% of the 5s.
@@ -171,9 +171,9 @@ It is often convenient to combine precision and recall into a single metric call
 
 To compute the $F_1 score$, simply call the \verb|f1_score()| function:
 \begin{pyc}
-from sklearn.metrics import f1_score
+    from sklearn.metrics import f1_score
 
-print(f1_score(y_train_5, y_train_pred))
+    print(f1_score(y_train_5, y_train_pred))
 \end{pyc}
 
 The $F_1 score$ favors classifiers that have similar precision and recall. This is not always what you want: in some contexts you mostly care about precision, and in other contexts you really care about recall.
@@ -182,40 +182,40 @@ Unfortunately, you can't have it both ways: increasing precision reduces recall,
 
 \subsection{The Precision/Recall Trade-off}
 
-To understand this trade-off, let's look at how the SGDClassifier makes its classification decisions. For each instance, it computes a score based on a decision function. If that score is greater than a threshold, it assigns the instance to the positive class; otherwise it assigns it to the negative class. 
+To understand this trade-off, let's look at how the SGDClassifier makes its classification decisions. For each instance, it computes a score based on a decision function. If that score is greater than a threshold, it assigns the instance to the positive class; otherwise it assigns it to the negative class.
 
 Scikit-Learn does not let you set the threshold directly, but it does give you access to the decision scores that it uses to make predictions. Instead of calling the classifier's \verb|predict()| method, you can call its \verb|decision_function()| method, which returns a score for each instance, and then use any threshold you want to make predictions based on those scores:
 \begin{pyc}
-y_scores = sgd_clf.decision_function([some_digit])
-print(y_scores)
-threshold = 0
-y_some_digit_pred = (y_scores > threshold)
-y_some_digit_pred
+    y_scores = sgd_clf.decision_function([some_digit])
+    print(y_scores)
+    threshold = 0
+    y_some_digit_pred = (y_scores > threshold)
+    y_some_digit_pred
 \end{pyc}
 
 The SGDClassifier uses a threshold equal to 0, so the preceding code returns the same result as the \verb|predict()| method (i.e., True).(有些样本的得分确实会小于0) Let's raise the threshold:
 \begin{pyc}
-threshold = 3_000
-y_some_digit_pred = (y_scores > threshold)
-y_some_digit_pred
+    threshold = 3_000
+    y_some_digit_pred = (y_scores > threshold)
+    y_some_digit_pred
 \end{pyc}
 
 This confirms that raising the threshold decreases recall.
 
 那么如何确定阈值呢？First, use the \verb|cross_val_predict()| function to get the scores of all instances in the training set, but this time specify that you want to return decision scores instead of predictions:
 \begin{pyc}
-y_scores = cross_val_predict(sgd_clf,
-                            X_train,
-                            y_train_5,
-                            cv=3,
-                            method='decision_function')
+    y_scores = cross_val_predict(sgd_clf,
+    X_train,
+    y_train_5,
+    cv=3,
+    method='decision_function')
 \end{pyc}
 
 With these scores, use the \verb|precision_recall_curve()| function to compute precision and recall for all possible thresholds (the function adds a last precision of 0 and a last recall of 1, corresponding to an infinite threshold):
 \begin{pyc}
-from sklearn.metrics import precision_recall_curve
+    from sklearn.metrics import precision_recall_curve
 
-precisions, recalls, thresholds = precision_recall_curve(y_train_5, y_scores)
+    precisions, recalls, thresholds = precision_recall_curve(y_train_5, y_scores)
 \end{pyc}
 
 Finally, use Matplotlib to plot precision and recall as functions of the threshold value \autoref{Precision and recall versus the decision threshold}.
@@ -229,25 +229,36 @@ You can see that precision really starts to fall sharply at around 80\% recall. 
 
 Suppose you decide to aim for 90\% precision. You could use the first plot to find the threshold you need to use, but that's not very precise. Alternatively, you can search for the lowest threshold that gives you at least 90\% precision. For this, you can use the NumPy array's \verb|argmax()| method. This returns the first index of the maximum value, which in this case means the first True value:
 \begin{pyc}
-idx_for_90_precision = (precisions >= .9).argmax()
-threshold_for_90_precision = thresholds[idx_for_90_precision]
-threshold_for_90_precision # 3370.0194991439594
+    idx_for_90_precision = (precisions >= .9).argmax()
+    threshold_for_90_precision = thresholds[idx_for_90_precision]
+    threshold_for_90_precision # 3370.0194991439594
 \end{pyc}
 
 To make predictions (on the training set for now), instead of calling the classifier's \verb|predict()| method, you can run this code:
 \begin{pyc}
-y_train_pred_90 = (y_scores >= threshold_for_90_precision)
+    y_train_pred_90 = (y_scores >= threshold_for_90_precision)
 
-precision_score(y_train_5, y_train_pred_90) # 0.9000345901072293
+    precision_score(y_train_5, y_train_pred_90) # 0.9000345901072293
 
-recall_at_90_precision = recall_score(y_train_5, y_train_pred_90)
-recall_at_90_precision # 0.4799852425751706
+    recall_at_90_precision = recall_score(y_train_5, y_train_pred_90)
+    recall_at_90_precision # 0.4799852425751706
 \end{pyc}
 
-As you can see, it is fairly easy to create a classifier with virtually any precision you want: just set a high enough threshold, and you're done. But wait, not so fast–a high-precision classifier is not very useful if its recall is too low! 
+As you can see, it is fairly easy to create a classifier with virtually any precision you want: just set a high enough threshold, and you're done. But wait, not so fast–a high-precision classifier is not very useful if its recall is too low!
 \tips{If someone says, ``Let's reach 99\% precision”, you should ask, ``At what recall?”}
 \subsection{The ROC Curve}
 \section{Multiclass Classification}
+Some Scikit-Learn classifiers (e.g., LogisticRegression, RandomForestClassifier,
+and GaussianNB) are capable of handling multiple classes natively. Others are strictly
+binary classifiers (e.g., SGDClassifier and SVC). However, there are various strategies
+that you can use to perform multiclass classification with multiple binary classifiers.
+
+One way to create a system that can classify the digit images into 10 classes (from 0
+to 9) is to train 10 binary classifiers, one for each digit (a 0-detector, a 1-detector, a
+2-detector, and so on). Then when you want to classify an image, you get the decision
+score from each classifier for that image and you select the class whose classifier
+outputs the highest score. This is called the \emph{one-versus-the-rest} (OvR) strategy, or
+sometimes \emph{one-versus-all} (OvA). 整个系统是由多个单类分类器组成，每个分类器可以判断一种class，然后给出概率或者得分，最高值最为结果。
 \subsection{}
 \subsection{}
 \section{}
